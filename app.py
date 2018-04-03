@@ -16,8 +16,8 @@ text = url_scrape(url)
 #we should now have a list of words scraped from the url
 print(text)
 print("Lexical diversity:",lexical_diversity(text))
-print("Frequency Distribution:",frequency_distribution(text, 20))
+print("Frequency Distribution:",frequency_distribution(text, 50))
 #generate our JSON for the wordcloud
-generate_json(text)#optionally add the font sizes
+generate_json(text, 200, 10) # optionally add the font sizes
 print("Open",filename,"in the browser to see the wordcloud. Trying to open...")
 webbrowser.open('file://' + os.path.realpath(filename))
