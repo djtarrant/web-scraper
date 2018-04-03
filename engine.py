@@ -46,6 +46,26 @@ def lexical_diversity(text):
     diversity_score = vocab_size / word_count
     return diversity_score
 
+def generate_json(text, large=80, small=20):
+    fdist = frequency_distribution(text)
+    lowest = fdist[-1][1]
+    highest = fdist[0][1]
+    print("l",lowest,"h",highest)
+    fhand = open('js/wordcloud.js','w')
+    fhand.write("wordcloud = [")
+    first = True
+    for tup in fdist: # freqdist is a list of tuples
+        if not first : fhand.write( ",\n")
+        first = False
+        size = tup[1] # tup[1] is the frequency in freqdist
+        size = (size - lowest) / float(highest - lowest)
+        size = int((size * large) + small)
+        # tup[0] is the word in freqdist
+        word = re.sub("[']","", tup[0]) # remove ' as it messes with the js
+        fhand.write("{text: '"+word+"', size: "+str(size)+"}")
+    fhand.write( "\n];\n")
+    fhand.close()
+
 
 class InvalidURLError(Exception):
     """Throw this when URL is not correct format."""
