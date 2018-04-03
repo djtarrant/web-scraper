@@ -46,7 +46,7 @@ def lexical_diversity(text):
     diversity_score = vocab_size / word_count
     return diversity_score
 
-def generate_json(text, large=80, small=20):
+def generate_json(text, large=150, small=20):
     fdist = frequency_distribution(text)
     lowest = fdist[-1][1]
     highest = fdist[0][1]
