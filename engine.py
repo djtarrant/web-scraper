@@ -50,7 +50,7 @@ def generate_json(text, large=150, small=20):
     fdist = frequency_distribution(text)
     lowest = fdist[-1][1]
     highest = fdist[0][1]
-    print("l",lowest,"h",highest)
+    #print("l",lowest,"h",highest)
     fhand = open('js/wordcloud.js','w')
     fhand.write("wordcloud = [")
     first = True
