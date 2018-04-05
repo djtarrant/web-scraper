@@ -14,7 +14,7 @@ except:
 
 text = url_scrape(url)
 #we should now have a list of words scraped from the url
-print(text)
+#print(text)
 print("Lexical diversity:",lexical_diversity(text))
 print("Frequency Distribution:",frequency_distribution(text, 50))
 #generate our JSON for the wordcloud
