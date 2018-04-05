@@ -21,3 +21,5 @@ The d3.js and wordcloud Javascript files were obtained from the internet and wer
 ## TO DO
 * Format space errors in text processing
 * Web wrapper for URL entry
+* Add word length and long words
+* Add different visualisations
