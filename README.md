@@ -4,7 +4,8 @@
 Takes in a URL and outputs a JSON data file of the most common words within that URL, along with a couple of other pieces of language processing information.
 
 ## Pip Install Python and Initialise Program
-To initialise the program, run app.py within a Python IDE. If you have not done so, the program will require installation or import of the Python libraries for NLTK and BeautifulSoup
+To initialise the program, run app.py within a Python IDE. If you have not done so, the program will require installation or import of the Python libraries for NLTK and BeautifulSoup.
+
 These can be found here:
 
 [NLTK](http://www.nltk.org/)
