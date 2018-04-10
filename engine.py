@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import ssl
 import re
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords # filter out stopwords, such as 'the', 'or', 'and'
 
 def test_url(url):
