@@ -11,22 +11,27 @@
   <script>
     var fill = d3.scale.category20();
 
-    var myWords = d3.layout.cloud().size([700, 700])
+    function myWords() {
+      d3.layout.cloud().size([700, 700])
         .words(wordcloud)
         .rotate(function() { return ~~(Math.random() * 2) * 35; })
         .font("Impact")
         .fontSize(function(d) { return d.size; })
         .on("end", draw)
         .start();
+    }
 
     function showWords(num) {
-        myWords;
-        num++;
-        //d3.select("svg").remove().transition().duration(3000);
-        if(num<=3){
-          //alert("Running: "+num)
-          showWords(num);
-        }
+      svg = d3.selectAll("body svg");
+      svg.remove();
+      myWords();
+      num++;
+      if(num<=10){
+        //alert("Running: "+num)
+        setTimeout(function () {
+          this.showWords(num);
+        }, 3000);
+      }
     }
     showWords(1);
 
@@ -44,7 +49,7 @@
           .style("font-family", "Impact")
           .style("fill", function(d, i) { return fill(i); })
           .attr("text-anchor", "middle")
-          .transition().duration(1000)
+          .transition().duration(3000)
           .attr("transform", function(d) {
             ;
             return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
