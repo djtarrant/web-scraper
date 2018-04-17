@@ -20,7 +20,6 @@ The program prompts you to enter a URL, or defaults to the [bbc.co.uk](http://ww
 The d3.js and wordcloud Javascript files were obtained from the internet and were not the focus of this project. When utilised within the wordcloud.html file they create a wordcloud of the most common words within the target URL. Parameters can be altered within the py files to change the wordcloud size and shape. Opening wordcloud.html is the final prompt of the app.py file output, which tries to do this automatically.
 
 ## TO DO
-* Format space errors in text processing
 * Web wrapper for URL entry
 * Add word length and long words
 * Add different visualisations
