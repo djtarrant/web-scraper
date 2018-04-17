@@ -1,14 +1,15 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import ssl
-import re
-import nltk
+import ssl, re, nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords # filter out stopwords, such as 'the', 'or', 'and'
 
+urlPattern = '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)'
+#https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))'
+
 def test_url(url):
     print("Testing URL: ", url, "...")
-    urls = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', url)
+    urls = re.findall(urlPattern+'+', url)
     print(urls, 'Length:', len(urls))
     if len(urls) == 1:
         return True
@@ -28,11 +29,15 @@ def url_scrape(url):
         script.extract() # remove these two elements from the BeautifulSoup object
 
     text = soup.get_text()
+    # remove url's
+    text = re.sub(urlPattern, "", text)
     text = re.sub("[^a-zA-Z' ]","", text) # remove everything that's not a word
     textPieces = text.split()
 
-    stop_words = set(stopwords.words("english")) # lists pointless words like 'it', 'the' etc
-    textPieces = [word for word in textPieces if not word in stop_words] # remove stopwords from the text
+    stopWords = set(stopwords.words("english")) # lists pointless words like 'it', 'the' etc
+    textPieces = [word for word in textPieces if not word in stopWords] # remove stopwords from the text
+    #print(textPieces)
+
 
     return (textPieces)
 
@@ -56,14 +61,22 @@ def generate_json(text, large=150, small=20):
     fhand.write("wordcloud = [")
     first = True
     for tup in fdist: # freqdist is a list of tuples
-        if not first : fhand.write( ",\n")
-        first = False
-        size = tup[1] # tup[1] is the frequency in freqdist
-        size = (size - lowest) / float(highest - lowest)
-        size = int((size * large) + small)
         # tup[0] is the word in freqdist
         word = re.sub("[']","", tup[0]) # remove ' as it messes with the js
+        wordFrequency = tup[1] # tup[1] is the frequency in freqdist
+        wordList = [w for w in nltk.corpus.words.words('en')] # list of English words
+        #textRemoved = [word for word in textPieces if word not in wordList] # keep track of removed non-English 'real' words
+        #textPieces = [word for word in textPieces if word in wordList and wordFrequency > 1] # only keep real words
+        if wordFrequency < 4: # if the 'word' is used only <n times
+            if word not in wordList: # check the word is valid
+                continue # it's not a valid word only used <n so disregard
+        if not first : fhand.write( ",\n")
+        first = False
+        size = wordFrequency
+        size = (size - lowest) / float(highest - lowest)
+        size = int((size * large) + small)
         fhand.write("{text: '"+word+"', size: "+str(size)+"}")
+
     fhand.write( "\n];\n")
     fhand.close()
 
