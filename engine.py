@@ -4,81 +4,86 @@ import ssl, re, nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords # filter out stopwords, such as 'the', 'or', 'and'
 
-urlPattern = '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)'
-#https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))'
+class ScraperEngine:
 
-def test_url(url):
-    print("Testing URL: ", url, "...")
-    urls = re.findall(urlPattern+'+', url)
-    print(urls, 'Length:', len(urls))
-    if len(urls) == 1:
-        return True
-    else:
-        raise InvalidURLError("URL not in correct format.")
+    urlPattern = '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)'
+    #https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))'
 
-def url_scrape(url):
-    # ignore SSL certificate errors
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+    def __init__(self, url):
+        self.url = url
 
-    html = urlopen(url, context=ctx).read()
-    soup = BeautifulSoup(html, "html.parser")
+    def test_url(self):
+        print("Testing URL: ", self.url, "...")
+        urls = re.findall(ScraperEngine.urlPattern+'+', self.url)
+        print(urls, 'Length:', len(urls))
+        if len(urls) == 1:
+            return True
+        else:
+            raise InvalidURLError("URL not in correct format.")
 
-    for script in soup(["script", "style"]):
-        script.extract() # remove these two elements from the BeautifulSoup object
+    def url_scrape(self):
+        # ignore SSL certificate errors
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
 
-    text = soup.get_text()
-    # remove url's
-    text = re.sub(urlPattern, "", text)
-    text = re.sub("[^a-zA-Z' ]","", text) # remove everything that's not a word
-    textPieces = text.split()
+        html = urlopen(self.url, context=ctx).read()
+        soup = BeautifulSoup(html, "html.parser")
 
-    stopWords = set(stopwords.words("english")) # lists pointless words like 'it', 'the' etc
-    textPieces = [word for word in textPieces if not word in stopWords] # remove stopwords from the text
-    #print(textPieces)
+        for script in soup(["script", "style"]):
+            script.extract() # remove these two elements from the BeautifulSoup object
 
+        text = soup.get_text()
+        # remove url's
+        text = re.sub(ScraperEngine.urlPattern, "", text)
+        text = re.sub("[^a-zA-Z' ]","", text) # remove everything that's not a word
+        textPieces = text.split()
 
-    return (textPieces)
-
-def frequency_distribution(text, num_common=50):
-    fdist = nltk.FreqDist(text)#(word.lower for word in text) # get the frequency of each word
-    return fdist.most_common(num_common)
+        stopWords = set(stopwords.words("english")) # lists pointless words like 'it', 'the' etc
+        textPieces = [word for word in textPieces if not word in stopWords] # remove stopwords from the text
+        #print(textPieces)
 
 
-def lexical_diversity(text):
-    word_count = len(text)
-    vocab_size = len(set(text))
-    diversity_score = vocab_size / word_count
-    return diversity_score
+        return (textPieces)
 
-def generate_json(text, large=150, small=20):
-    fdist = frequency_distribution(text)
-    lowest = fdist[-1][1]
-    highest = fdist[0][1]
-    #print("l",lowest,"h",highest)
-    fhand = open('js/wordcloud.js','w')
-    fhand.write("wordcloud = [")
-    first = True
-    for tup in fdist: # freqdist is a list of tuples
-        # tup[0] is the word in freqdist
-        word = re.sub("[']","", tup[0]) # remove ' as it messes with the js
-        wordFrequency = tup[1] # tup[1] is the frequency in freqdist
-        wordList = [w for w in nltk.corpus.words.words('en')] # list of English words
-        #textRemoved = [word for word in textPieces if word not in wordList] # keep track of removed non-English 'real' words
-        #textPieces = [word for word in textPieces if word in wordList and wordFrequency > 1] # only keep real words
-        if wordFrequency < 4: # if the 'word' is used only <n times
-            if word not in wordList: # check the word is valid
-                continue # it's not a valid word only used <n so disregard
-        if not first : fhand.write( ",\n")
-        first = False
-        size = wordFrequency
-        size = (size - lowest) / float(highest - lowest)
-        size = int((size * large) + small)
-        fhand.write("{text: '"+word+"', size: "+str(size)+"}")
+    def frequency_distribution(self, text, num_common=50):
+        fdist = nltk.FreqDist(text)#(word.lower for word in text) # get the frequency of each word
+        return fdist.most_common(num_common)
 
-    fhand.write( "\n];\n")
-    fhand.close()
+
+    def lexical_diversity(self,text):
+        word_count = len(text)
+        vocab_size = len(set(text))
+        diversity_score = vocab_size / word_count
+        return diversity_score
+
+    def generate_json(self, text, large=150, small=20):
+        fdist = self.frequency_distribution(text)
+        lowest = fdist[-1][1]
+        highest = fdist[0][1]
+        #print("l",lowest,"h",highest)
+        fhand = open('js/wordcloud.js','w')
+        fhand.write("wordcloud = [")
+        first = True
+        for tup in fdist: # freqdist is a list of tuples
+            # tup[0] is the word in freqdist
+            word = re.sub("[']","", tup[0]) # remove ' as it messes with the js
+            wordFrequency = tup[1] # tup[1] is the frequency in freqdist
+            wordList = [w for w in nltk.corpus.words.words('en')] # list of English words
+            #textRemoved = [word for word in textPieces if word not in wordList] # keep track of removed non-English 'real' words
+            #textPieces = [word for word in textPieces if word in wordList and wordFrequency > 1] # only keep real words
+            if wordFrequency < 4: # if the 'word' is used only <n times
+                if word not in wordList: # check the word is valid
+                    continue # it's not a valid word only used <n so disregard
+            if not first : fhand.write( ",\n")
+            first = False
+            size = wordFrequency
+            size = (size - lowest) / float(highest - lowest)
+            size = int((size * large) + small)
+            fhand.write("{text: '"+word+"', size: "+str(size)+"}")
+
+        fhand.write( "\n];\n")
+        fhand.close()
 
 
 class InvalidURLError(Exception):
