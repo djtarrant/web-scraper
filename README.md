@@ -21,3 +21,4 @@ The d3.js and wordcloud Javascript files were obtained from the internet and wer
 
 ## TO DO
 * Add different visualisations
+* Add inheritance for different types of operation
