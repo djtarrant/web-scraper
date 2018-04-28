@@ -8,9 +8,12 @@
     <script src="js/wordcloud.js"></script>
 </head>
 <body>
+  <h1 id = "type"></h1>
+  <strong id = "url"></strong><br/>
   <script>
     var fill = d3.scale.category20();
-
+    document.getElementById("url").innerHTML = url;
+    document.getElementById("type").innerHTML = type;
     function myWords() {
       d3.layout.cloud().size([700, 700])
         .words(wordcloud)
@@ -56,6 +59,7 @@
           })
           .text(function(d) { return d.text; });
     }
+
   </script>
 </body>
 </html>
