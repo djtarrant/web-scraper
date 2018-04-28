@@ -6,6 +6,7 @@ from nltk.corpus import stopwords # filter out stopwords, such as 'the', 'or', '
 
 class ScraperEngine:
 
+    wordList = [w for w in nltk.corpus.words.words('en')] # list of English words
     urlPattern = '((https?):((//)|(\\\\))+([\w\d:#@%/;$()~_?\+-=\\\.&](#!)?)*)'
     #https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))'
 
@@ -43,13 +44,7 @@ class ScraperEngine:
         textPieces = [word for word in textPieces if not word in stopWords] # remove stopwords from the text
         #print(textPieces)
 
-
         return (textPieces)
-
-    def frequency_distribution(self, text, num_common=50):
-        fdist = nltk.FreqDist(text)#(word.lower for word in text) # get the frequency of each word
-        return fdist.most_common(num_common)
-
 
     def lexical_diversity(self,text):
         word_count = len(text)
@@ -57,23 +52,42 @@ class ScraperEngine:
         diversity_score = vocab_size / word_count
         return diversity_score
 
-    def generate_json(self, text, large=150, small=20):
-        fdist = self.frequency_distribution(text)
+    def frequency_distribution(self, text, num=50):
+        fdist = nltk.FreqDist(text)#(word.lower for word in text) # get the frequency of each word
+        return fdist.most_common(num)
+
+    def longest_words(self, text, num=50):
+        text.sort() # sorts normally by alphabetical order
+        text.sort(key=len, reverse=True) # sorts by descending length
+        #length_order = [(word, len(word)) for word in text] # get the frequency of each word
+        length_order = list()
+        for word in text:
+            if word in self.wordList: # check the word is valid:
+                tup = (word,len(word))
+                length_order.append(tup)
+        return length_order[:num]
+
+    def word_lengths(self, text, num=50):
+        fdist = nltk.FreqDist(len(word) for word in text) # get the frequency of each word
+        return fdist.most_common(num)
+
+    def generate_json(self, fdist, type, large=150, small=20):
+        #fdist = self.frequency_distribution(text)
         lowest = fdist[-1][1]
         highest = fdist[0][1]
         #print("l",lowest,"h",highest)
         fhand = open('js/wordcloud.js','w')
+        fhand.write('url = "'+self.url+'"; type = "'+type+'";')
         fhand.write("wordcloud = [")
         first = True
         for tup in fdist: # freqdist is a list of tuples
             # tup[0] is the word in freqdist
-            word = re.sub("[']","", tup[0]) # remove ' as it messes with the js
+            word = re.sub("[']","", str(tup[0])) # remove ' as it messes with the js
             wordFrequency = tup[1] # tup[1] is the frequency in freqdist
-            wordList = [w for w in nltk.corpus.words.words('en')] # list of English words
             #textRemoved = [word for word in textPieces if word not in wordList] # keep track of removed non-English 'real' words
             #textPieces = [word for word in textPieces if word in wordList and wordFrequency > 1] # only keep real words
             if wordFrequency < 4: # if the 'word' is used only <n times
-                if word not in wordList: # check the word is valid
+                if word not in self.wordList: # check the word is valid
                     continue # it's not a valid word only used <n so disregard
             if not first : fhand.write( ",\n")
             first = False
