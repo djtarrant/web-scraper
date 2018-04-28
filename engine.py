@@ -80,10 +80,10 @@ class ScraperEngine:
         fhand.write('url = "'+self.url+'"; type = "'+type+'";')
         fhand.write("wordcloud = [")
         first = True
-        for tup in fdist: # freqdist is a list of tuples
+        for tup in fdist: # fdist is a list of tuples
             # tup[0] is the word in freqdist
             word = re.sub("[']","", str(tup[0])) # remove ' as it messes with the js
-            wordFrequency = tup[1] # tup[1] is the frequency in freqdist
+            wordFrequency = tup[1] # tup[1] is the frequency in fdist
             #textRemoved = [word for word in textPieces if word not in wordList] # keep track of removed non-English 'real' words
             #textPieces = [word for word in textPieces if word in wordList and wordFrequency > 1] # only keep real words
             if wordFrequency < 4: # if the 'word' is used only <n times
